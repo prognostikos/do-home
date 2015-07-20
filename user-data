@@ -1,5 +1,8 @@
 #!/bin/bash -ex
 
+echo "Europe/Copenhagen" > /etc/timezone
+dpkg-reconfigure -f noninteractive tzdata
+
 # install packages
 apt-get update -y
 apt-get install -y \
