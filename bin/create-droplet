@@ -1,0 +1,18 @@
+#!/bin/bash -ex
+
+if ! command -v doctl > /dev/null; then
+  echo "missing-dependancy=doctl"
+  exit 1
+fi
+
+doctl droplet create \
+  --domain "eu.prognostikos.com" \
+  --size "512mb" \
+  --region "ams3" \
+  --image "ubuntu-14-04-x64" \
+  --ssh-keys digital_ocean \
+  --user-data-file "./user-data" \
+  --wait-for-active \
+  eu.prognostikos.com
+
+doctl droplet list

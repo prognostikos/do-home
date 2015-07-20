@@ -1,0 +1,51 @@
+#!/bin/bash -ex
+
+# install packages
+apt-get update -y
+apt-get install -y \
+  bind9-host \
+  curl \
+  dnsutils \
+  git \
+  htop \
+  iftop \
+  iputils-tracepath \
+  irssi \
+  lsof \
+  mosh \
+  mtr-tiny \
+  netcat-openbsd \
+  ngrep \
+  nmap \
+  ntp \
+  rsync \
+  socat \
+  strace \
+  sysstat \
+  tcpflow \
+  tmux \
+  tree \
+  unattended-upgrades \
+  vim-nox \
+  zip \
+  zsh \
+  #
+
+curl -sSL https://github.com/direnv/direnv/releases/download/v2.6.0/direnv.linux-amd64 > /usr/local/bin/direnv
+chmod 755 /usr/local/bin/direnv
+
+printf "APT::Periodic::Update-Package-Lists \"1\";\nAPT::Periodic::Unattended-Upgrade \"1\";" > /etc/apt/apt.conf.d/20auto-upgrades
+
+unattended-upgrade
+
+# create my user and setup for ssh + sudo
+useradd -m rohrer -s /bin/zsh
+cp -R ~/.ssh /home/rohrer/.ssh
+chown -R rohrer:rohrer /home/rohrer/.ssh
+echo "rohrer ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/rohrer
+su -c rohrer 'git clone --recursive https://github.com/prognostikos/dotfiles.git /home/rohrer/.dotfiles'
+
+# fix ssh config (key only, no root)
+sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
+sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
+service sshd restart
